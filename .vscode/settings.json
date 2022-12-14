@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "pass2macro.C": "cpp",
-        "pass1macro.C": "cpp"
+        "pass1macro.C": "cpp",
+        "singlepassmacro.C": "cpp"
     }
 }
