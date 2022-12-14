@@ -64,7 +64,6 @@ void main() {
                     l=l+1;
                 }
                 fprintf(f5,"%s\t%s\n",q,s2);
-                break;
             }
             else if(strcmp(mne,"RESB")==0)
             lc=lc+atoi(opnd);
@@ -72,7 +71,6 @@ void main() {
                 strcpy(s3,"#");
                 lc=lc+3;
                 fprintf(f5,"%s\t%s\n",opnd,s3);
-                break;
             }
         } // else la=-
         fseek(fopt,SEEK_SET,0);
@@ -80,9 +78,9 @@ void main() {
     }
     fseek(f5,SEEK_SET,0);
     pgmlen=lc-sa;
-    printf("H^%s^%d^0%x\n",name,sa,pgmlen);
+    printf("H^%s^%d^%02X\n",name,sa,pgmlen);
     printf("T^");
-    printf("00%d^0%x",sa,pgmlen);
+    printf("00%d^%02X",sa,pgmlen);
     fscanf(f5,"%s%s",obj1,obj2);
     while(!feof(f5)) {
         if(strcmp(obj2,"0000")==0)
