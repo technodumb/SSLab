@@ -1,0 +1,8 @@
+EX1 MACRO 0,1
+- LDA 0
+- STA 1
+- MEND -
+EX3 MACRO 2,3
+- LDA 2
+- STA 3
+- MEND -
