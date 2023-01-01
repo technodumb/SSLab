@@ -3,7 +3,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-int expanding = 0;
 
 void main()
 {
@@ -72,7 +71,6 @@ void main()
             while(!feof(fmnt)){
                 if(!strcmp(opcode, mname)){
                     found++;
-                    expanding = 1;
                     i=j=di=dj=0;
                     char dindex[20];
                     fseek(fmdt, mloc, SEEK_SET);

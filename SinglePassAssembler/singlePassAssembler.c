@@ -98,12 +98,12 @@ void main() {
     char textrec[70]="";
     int textreclen=0;
     fscanf(fint, "%s %s %s %s %s", codeAddr, label, opcode, operand, code);
-    fprintf(fout, "T^%s", codeAddr);
+    fprintf(fout, "T^%s^", codeAddr);
     while(!feof(fint)){
         if(strcmp(opcode, "RESB") && strcmp(opcode, "RESW")){        
             if(strlen(textrec)>70){
-                fprintf(fout, "^%02X%s\n", textreclen, textrec);
-                fprintf(fout, "T^%s", codeAddr);
+                fprintf(fout, "%02X%s\n", textreclen, textrec);
+                fprintf(fout, "T^%s^", codeAddr);
                 textreclen=0;
                 strcpy(textrec, "");
             }
@@ -114,7 +114,7 @@ void main() {
         fscanf(fint, "%s %s %s %s %s", codeAddr, label, opcode, operand, code);
     }
     if(strlen(textrec)<70){
-        fprintf(fout, "T^%s^%02X%s\n", codeAddr, textreclen, textrec);
+        fprintf(fout, "%02X%s\n", textreclen, textrec);
         textreclen=0;
         strcpy(textrec, "");
     }
