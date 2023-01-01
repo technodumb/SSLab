@@ -3,12 +3,12 @@
 #include<stdlib.h>
 
 void main() {
-    FILE *finp, *fopc, *fsym, *fint;
+    FILE *finp, *fopc, *fsym, *fint, *flen;
     finp = fopen("input.txt", "r");
-    // fout = fopen("output.txt", "w");
     fopc = fopen("optab.txt", "r");
     fsym = fopen("symtab.txt", "w");
     fint = fopen("intermediate.txt", "w");
+    flen = fopen("length.txt", "w");
 
     char label[20], opcode[20], operand[20];
     char mneu[20], mneucode[20];
@@ -29,7 +29,7 @@ void main() {
     while(strcmp(opcode, "END")){
         fprintf(fint, "%04x\t%s\t%s\t%s\n", locctr, label, opcode, operand);
         if(strcmp(label, "-")){
-            fprintf(fsym, "%s %06x", label, locctr);
+            fprintf(fsym, "%s %04X\n", label, locctr);
         }
         if(!strcmp(opcode, "RESB") || !strcmp(opcode,"RESW")){
             // tbc
@@ -62,8 +62,11 @@ void main() {
         }
         fscanf(finp, "%s %s %s", label, opcode, operand);
     }
+    fprintf(fint, "%X\t%s\t%s\t%s\n", locctr, label, opcode, operand);
+    fprintf(flen, "%06X", locctr-staddr);
     fclose(finp);
     fclose(fint);
     fclose(fsym);
     fclose(fopc);
+    fclose(flen);
 }
