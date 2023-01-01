@@ -1,70 +1,128 @@
 #include <stdio.h>
-#include <conio.h>
 #include <ctype.h>
 #include <string.h>
-int m = 0, i, j, flag = 0;
-char c, *s1, *s2, *s3, *s4, str[50] = " ", str1[50] = " ";
-char mac[10][10];
+#include <stdlib.h>
+
+int expanding = 0;
+
 void main()
 {
-    FILE *fpm = fopen("macro.txt", "r");
-    FILE *fpi = fopen("minput.txt", "r");
-    FILE *fpo = fopen("moutput.txt", "w");
-    clrscr();
-    while (!feof(fpm))
-    {
-        fgets(str, 50, fpm);
-        s1 = strtok(str, " ");
-        s2 = strtok(NULL, " ");
-        if (strcmp(s1, "MACRO") == 0)
-        {
-            strcpy(mac[m], s2);
-            m++;
-        }
-        s1 = s2 = NULL;
-    }
-    fgets(str, 50, fpi);
-    while (!feof(fpi))
-    {
-        flag = 0;
-        strcpy(str1, str);
-        for (i = 0; i < m; i++)
-        {
-            if (strcmp(str1, mac[i]) == 0)
-            {
-                rewind(fpm);
-                while (!feof(fpm))
-                {
-                    fgets(str, 50, fpm);
-                    s2 = strtok(str, " ");
-                    s3 = strtok(NULL, " ");
-                    if (strcmp(s2, "MACRO") == 0 && strcmp(s3, str1) == 0)
-                    {
-                        fgets(str, 50, fpm);
-                        strncpy(s4, str, 4);
-                        s4[4] = '\0';
-                        while (strcmp(s4, "MEND") != 0)
-                        {
-                            fprintf(fpo, "%s", str);
-                            printf("\n####%s", str);
-                            fgets(str, 50, fpm);
-                            strncpy(s4, str, 4);
-                            s4[4] = '\0';
+    FILE *finp, *fout, *farg, *fmdt, *fmnt;
+    char label[20], opcode[20], operand[20];
+    char dlabel[20], dopcode[20], doperand[20];
+    char mname[20], mdtline[20], arg[20];
+    char arguments[20][20], argument[20];
+    char expargs[20][20], exparg[20];
+    int curLine=0, mloc=0, narg=0;
+    int i, j, di, dj;
+    finp = fopen("input.txt", "r");
+    fout = fopen("output.txt", "w+");
+    farg = fopen("arg.txt", "w+");
+    fmdt = fopen("mdt.txt", "w+");
+    fmnt = fopen("mnt.txt", "w+");
+    
+    fscanf(finp, "%s %s %s", label, opcode, operand);
+
+    while(strcmp(opcode, "END")) {
+        if(!strcmp(opcode, "MACRO")){
+            int level=1;
+            fseek(fmnt, 0, SEEK_END);
+            fprintf(fmnt, "%s %d\n", label, ftell(fmdt));
+            fprintf(fmdt, "%s %s ", label, opcode);
+            i=0;
+            while(operand[i]!='\0'){
+                j=0;
+                while(operand[i]!='\0' && operand[i]!=',') {
+                    argument[j]=operand[i];
+                    argument[j+1]='\0';
+                    j++; i++;
+                }
+                strcpy(arguments[narg], argument);
+                fprintf(fmdt, "?%d", narg);
+                if(operand[i]==','){ 
+                    fprintf(fmdt, ",");
+                    i++;
+                }
+                narg++;
+            }
+            fprintf(fmdt, "\n");
+            while(level>0) {
+                fscanf(finp, "%s %s %s", label, opcode, operand);
+                if(operand[0]=='&'){
+                    for(int i=0; i<narg; i++){
+                        if(!strcmp(operand, arguments[i])){
+                            sprintf(operand, "?%d", i);
+                            break;
                         }
                     }
                 }
-                flag = 1;
-                break;
+                fprintf(fmdt, "%s %s %s\n", label, opcode, operand);
+                if(!strcmp(opcode, "MACRO")){
+                    level++;
+                }
+                else if(!strcmp(opcode, "MEND")){
+                    level--;
+                }
             }
         }
-        if (flag == 0)
-        {
-            fprintf(fpo, "%s", str);
-            printf("%s", str);
+        else {
+            fseek(fmnt, 0, SEEK_SET);
+            fscanf(fmnt, "%s %d", mname, &mloc);
+            int found=0;
+            while(!feof(fmnt)){
+                if(!strcmp(opcode, mname)){
+                    found++;
+                    expanding = 1;
+                    i=j=di=dj=0;
+                    char dindex[20];
+                    fseek(fmdt, mloc, SEEK_SET);
+                    fscanf(fmdt, "%s %s %s", dlabel, dopcode, doperand);
+                    while(operand[i]!='\0'){
+                        j=0;
+                        while(operand[i]!='\0' && operand[i]!=',') {
+                            exparg[j]=operand[i];
+                            exparg[j+1]='\0';
+                            j++; i++;
+                        }
+                        if(operand[i]==',')
+                            i++;
+                        dj=0;
+                        while(doperand[di]!='\0' && doperand[di]!=','){
+                            dindex[dj]=doperand[di];
+                            dindex[dj+1]='\0';
+                            dj++; di++;
+                        }
+                        if(doperand[di]==',')
+                            di++;
+                        // printf("%d %s", atoi(dindex), exparg);
+                        strncpy(dindex, dindex+1, strlen(dindex));
+                        printf("%s %s\n", dindex, exparg);
+                        strcpy(expargs[atoi(dindex)], exparg);
+                    }
+                    fscanf(fmdt, "%s %s %s", dlabel, dopcode, doperand);
+                    while(strcmp(dopcode, "MEND")){
+                        if(doperand[0]=='?'){
+                            strncpy(doperand, doperand+1, strlen(doperand));
+                            strcpy(doperand, expargs[atoi(doperand)]);
+                        }
+                        fprintf(fout, "%s %s %s\n", dlabel, dopcode, doperand);
+                        fscanf(fmdt, "%s %s %s", dlabel, dopcode, doperand);
+                    }
+                    // break;
+                }
+                fscanf(fmnt, "%s %d", mname, &mloc);
+            }
+            if(!found){
+                fprintf(fout, "%s %s %s\n", label, opcode, operand);
+            }
         }
-        fgets(str, 50, fpi);
+        fscanf(finp, "%s %s %s", label, opcode, operand);
     }
-    fclose(fpm);
-    fclose(fpi);
-    fclose(fpo);
+    fprintf(fout, "%s %s %s\n", label, opcode, operand);
+    fclose(finp);
+    fclose(fout);
+    fclose(farg);
+    fclose(fmdt);
+    fclose(fmnt);
 }
+
