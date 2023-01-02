@@ -92,16 +92,13 @@ void main()
                         }
                         if(doperand[di]==',')
                             di++;
-                        // printf("%d %s", atoi(dindex), exparg);
-                        strncpy(dindex, dindex+1, strlen(dindex));
                         printf("%s %s\n", dindex, exparg);
-                        strcpy(expargs[atoi(dindex)], exparg);
+                        strcpy(expargs[atoi(dindex+1)], exparg);
                     }
                     fscanf(fmdt, "%s %s %s", dlabel, dopcode, doperand);
                     while(strcmp(dopcode, "MEND")){
                         if(doperand[0]=='?'){
-                            strncpy(doperand, doperand+1, strlen(doperand));
-                            strcpy(doperand, expargs[atoi(doperand)]);
+                            strcpy(doperand, expargs[atoi(doperand+1)]);
                         }
                         fprintf(fout, "%s %s %s\n", dlabel, dopcode, doperand);
                         fscanf(fmdt, "%s %s %s", dlabel, dopcode, doperand);
