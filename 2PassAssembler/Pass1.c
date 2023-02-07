@@ -27,7 +27,7 @@ void main() {
     }
 
     while(strcmp(opcode, "END")){
-        fprintf(fint, "%04x\t%s\t%s\t%s\n", locctr, label, opcode, operand);
+        fprintf(fint, "%04X\t%s\t%s\t%s\n", locctr, label, opcode, operand);
         if(strcmp(label, "-")){
             fprintf(fsym, "%s %04X\n", label, locctr);
         }
@@ -41,8 +41,8 @@ void main() {
                 locctr += ioper;
         }
         else if(!strcmp(opcode, "WORD")|| !strcmp(opcode, "BYTE")){
-            if(strcmp(opcode, "BYTE")){
-                locctr+=strlen(operand)-2;
+            if(!strcmp(opcode, "BYTE")){
+                locctr+=strlen(operand)-3;
             }
             else{
                 locctr+=3;
@@ -52,7 +52,6 @@ void main() {
             fseek(fopc, 0, SEEK_SET);
             fscanf(fopc, "%s %s", mneu, mneucode);
             while(!feof(fopc)){
-                printf("hey");
                 if(!strcmp(mneu, opcode)){
                     locctr+=3;
                     break;
