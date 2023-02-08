@@ -12,7 +12,6 @@ void main() {
     fout = fopen("output.txt", "w+");
 
     int locctr, staddr, addr;
-    int ntexts=0;
 
     char label[20], opcode[20], operand[20];
     char optmne[20], optcod[20];
@@ -30,7 +29,7 @@ void main() {
     else {
         locctr = staddr = 0;
     }
-    fprintf(fout, "H^%s^%06X^%06X\n", name, staddr, 0);
+    fprintf(fout, "H^%s%*s^%06X^%06X\n", name, 6-strlen(name),"", staddr, 0);
     fprintf(fout, "T^%06X^", locctr);
 
     char textrec[70]="";
