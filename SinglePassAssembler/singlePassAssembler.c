@@ -2,42 +2,40 @@
 #include<string.h>
 #include<stdlib.h>
 
-void main() {
-    FILE *finp, *fopc, *fsym, *fsnf, *fint, *fout;
+void main(){
+    FILE *finp, *fopt, *fsym, *fsnf, *flist, *fout;
     finp = fopen("input.txt", "r");
-    fopc = fopen("optab.txt", "r");
+    fopt = fopen("optab.txt", "r");
     fsym = fopen("symtab.txt", "w+");
     fsnf = fopen("symnotfound.txt", "w+");
-    fint = fopen("interm.txt", "w+");
+    flist = fopen("list.txt", "w+");
     fout = fopen("output.txt", "w+");
 
-    int locctr, staddr, addr;
-
     char label[20], opcode[20], operand[20];
-    char optmne[20], optcod[20];
+    char opmne[20], opopc[20];
     char symlab[20], symadd[20];
     char snflab[20], snfadd[20];
-    char name[20];
 
+    int locctr, staddr, addr;
+    char name[20];
     fscanf(finp, "%s %s %s", label, opcode, operand);
     if(!strcmp(opcode, "START")){
         sscanf(operand, "%x", &addr);
-        locctr = staddr = addr;
+        locctr=staddr = addr;
         strcpy(name, label);
         fscanf(finp, "%s %s %s", label, opcode, operand);
     }
-    else {
-        locctr = staddr = 0;
+    else{
+        locctr=staddr = 0;
     }
-    fprintf(fout, "H^%s%*s^%06X^%06X\n", name, 6-strlen(name),"", staddr, 0);
+    fprintf(fout, "H^%s^%06X^%06X\n", name, staddr, 0);
     fprintf(fout, "T^%06X^", locctr);
 
     char textrec[70]="";
     int textreclen=0;
 
     while(strcmp(opcode, "END")){
-        char curopc[20]="",curopr[20]="0000", curobjc[20]="";
-        int objlen;
+        char curopc[20]="", curopr[20]="0000", curobj[20]="";
         fseek(fsym, 0, SEEK_SET);
         fscanf(fsym, "%s %s", symlab, symadd);
         while(!feof(fsym)){
@@ -49,80 +47,76 @@ void main() {
         }
         if(strcmp(label, "-")){
             fseek(fsym, 0, SEEK_END);
-            fprintf(fsym, "%s %X\n", label, locctr);
+            fprintf(fsym, "%s %04X\n", label, locctr);
         }
-        fseek(fopc, 0, SEEK_SET);
-        fscanf(fopc, "%s %s", optmne, optcod);
-        while(!feof(fopc)){
-            if(!strcmp(opcode, optmne)){
-                strcpy(curopc, optcod);
+        fseek(fopt, 0, SEEK_SET);
+        fscanf(fopt, "%s %s", opmne, opopc);
+        while(!feof(fopt)){
+            if(!strcmp(opcode, opmne)){
+                strcpy(curopc, opopc);
                 if(!strcmp(curopr, "0000")){
-                    fprintf(fsnf,"%s %X\n", operand, locctr+1);
+                    fprintf(fsnf, "%s %X\n", operand, locctr+1);
                 }
-                strcpy(curobjc, curopc);
-                strcat(curobjc, curopr);
-                fprintf(fint, "%06X\t%s\t%s\t%s\t%s\n", locctr, label, opcode, operand, curobjc);
+                strcpy(curobj, curopc);
+                strcat(curobj, curopr);
+                fprintf(flist, "%06X %s %s %s %s\n", locctr, label, opcode, operand, curobj);
                 locctr+=3;
                 break;
             }
-            fscanf(fopc, "%s %s", optmne, optcod);
+            fscanf(fopt, "%s %s", opmne, opopc);
         }
-        if(!strcmp(opcode, "RESB") ){
-            fprintf(fint, "%06X\t%s\t%s\t%s\t%s\n", locctr, label, opcode, operand, "-");
-            locctr += atoi(operand);
+            printf("heelo");
+        if(!strcmp(opcode, "RESB")){
+                fprintf(flist, "%06X %s %s %s -\n", locctr, label, opcode, operand);
+            locctr+=atoi(operand);
         }
-        else if(!strcmp(opcode, "RESW") ){
-            fprintf(fint, "%06X\t%s\t%s\t%s\t%s\n", locctr, label, opcode, operand, "-");
-            locctr += atoi(operand)*3;
-        }
-        else if(!strcmp(opcode, "BYTE") ){
-            int byteindex=0;
-            for(int i=2; i<strlen(operand)-1; i++){
-                if(operand[0]=='X'){
-                    curopr[byteindex] = operand[i];
-                    byteindex++;
-                }
-                if(operand[0]=='C'){
-                    byteindex+= sprintf(&curopr[byteindex],"%X", (int)operand[i]);
-                }
-                curopr[byteindex] = '\0';
-            }
-            strcpy(curobjc, curopr);
-            fprintf(fint, "%06X\t%s\t%s\t%s\t%s\n", locctr, label, opcode, operand, curopr);
-            locctr += strlen(operand)-3;
-        }
-        else if(!strcmp(opcode, "WORD") ){
+        else if(!strcmp(opcode, "RESW")){
+            fprintf(flist, "%06X %s %s %s -\n", locctr, label, opcode, operand);
+            locctr+=atoi(operand)*3;
+        } 
+        else if(!strcmp(opcode, "WORD")){
             int wordval;
-            sscanf(operand, "%06X", &wordval);
-            sprintf(curobjc, "%06X", wordval);
-            fprintf(fint, "%06X\t%s\t%s\t%s\t%s\n", locctr, label, opcode, operand, curobjc);
-            locctr += strlen(operand)-3;
+            sscanf(operand, "%x", &wordval);
+            sprintf(curobj, "%06X", wordval);
+            fprintf(flist, "%06X %s %s %s %s\n", locctr, label, opcode, operand, curobj);
+            locctr+=3;
         }
-        objlen = strlen(curobjc)/2;
-        if(textreclen+objlen>30){
-            fprintf(fout, "%02X%s\n", textreclen, textrec);
-            fprintf(fout, "T^%06X^", locctr);
-            textreclen=0;
+        else if(!strcmp(opcode, "BYTE")){
+            if(operand[0]=='X'){
+                for(int i=2; i<strlen(operand)-1; i++){
+                        sprintf(curobj, "%s%c", curobj, operand[i]);
+
+                }
+            }
+            if(operand[0]=='C'){
+                for(int i=2; i<strlen(operand)-1; i++){
+                    sprintf(curobj, "%s%X", curobj, (int)operand[i]);
+                }
+            }
+            fprintf(flist, "%06X %s %s %s %s\n", locctr, label, opcode, operand, curobj);
+            locctr+=strlen(curobj);
+        }
+        if(strlen(textrec)+strlen(curobj)>60){
+            fprintf(fout, "%X%s\n", strlen(textrec)/2, textrec);
             strcpy(textrec, "");
+            fprintf(fout, "T^%06X^", locctr);
         }
-        textreclen+=objlen;
-        if(strcmp(curobjc, "")){
-            sprintf(textrec,"%s^%s", textrec, curobjc);
-        }
+        if(strlen(curobj)>0)
+            sprintf(textrec, "%s^%s", textrec, curobj);
         fscanf(finp, "%s %s %s", label, opcode, operand);
     }
     if(strlen(textrec)>0){
-        fprintf(fout, "%02X%s\n", textreclen, textrec);
+        fprintf(fout, "%02X%s\n", strlen(textrec)/2, textrec);
     }
     fseek(fsnf, 0, SEEK_SET);
     fscanf(fsnf, "%s %s", snflab, snfadd);
     while(!feof(fsnf)){
+    printf("%s %s\n", snflab, snfadd);
         fseek(fsym, 0, SEEK_SET);
         fscanf(fsym, "%s %s", symlab, symadd);
         while(!feof(fsym)){
-            printf("%s %s", symlab, snflab);
-            if(!strcmp(symlab, snflab)){
-                fprintf(fout, "T^%s^02^%s\n", snfadd, symadd);
+            if(!strcmp(snflab, symlab)){
+                fprintf(fout, "T^00%s^04^%s\n", snfadd, symadd);
                 break;
             }
             fscanf(fsym, "%s %s", symlab, symadd);
@@ -130,11 +124,13 @@ void main() {
         fscanf(fsnf, "%s %s", snflab, snfadd);
     }
     fprintf(fout, "E^%06X", staddr);
-    printf("done");
+    fprintf(flist, "%06X %s %s %s -\n", locctr, label, opcode, operand);
+    fseek(fout, 0, SEEK_SET);
+    fprintf(fout, "H^%s^%06X^%06X\n", name, staddr, locctr-staddr);
     fclose(finp);
-    fclose(fopc);
     fclose(fsym);
     fclose(fsnf);
-    fclose(fint);
-    fclose(fint);
+    fclose(fopt);
+    fclose(flist);
+    fclose(fout);
 }
