@@ -76,7 +76,6 @@ void main(){
             fseek(fopc, 0, SEEK_SET);
             fscanf(fopc, "%s %s", mneu, mneucode);
             while(!feof(fopc)){
-                printf("%s %s -- ", mneu, opcode);
                 if(!strcmp(mneu, opcode)){
                     strcat(textrec, "^");
                     strcat(textrec, mneucode);
