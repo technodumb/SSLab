@@ -1,9 +1,23 @@
-EX1 MACRO   &A,&B
--   LDA &A
--   STA &B
+EX1 MACRO   &Agc,&Bgds
+-   LDA &Agc
+-   LDA N3
+-   STA &Bgds
+-   STA &Bgds
 -   MEND    -
+
+MAC MACRO  &C,&D
+-   ADD &C
+-   SUB &D
+-   MEND    -
+
+
 SAMPLE  START   1000
--   EX1 N1,N2
+-   EX1 N1,N3
+-   MAC N1,N2
+-   STA N1
+-   LDA N2
 N1  RESW    1
 N2  RESW    1
+N3  RESW    1
+N7  RESW    2
 -   END -

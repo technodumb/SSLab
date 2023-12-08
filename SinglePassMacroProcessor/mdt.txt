@@ -1,0 +1,10 @@
+EX1 MACRO ?0,?1
+- LDA ?0
+- LDA N3
+- STA ?1
+- STA ?1
+- MEND -
+MAC MACRO ?2,?3
+- ADD ?2
+- SUB ?3
+- MEND -

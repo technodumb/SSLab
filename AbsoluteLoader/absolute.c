@@ -19,7 +19,7 @@ void main() {
             i++;
             continue;
         }
-        if(level==1){
+        if(level==1) {
             name[j]=line[i];
             name[++j]='\0';
         }

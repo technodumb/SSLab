@@ -9,7 +9,7 @@ int main() {
     mdt = fopen("mDef.txt", "w");
     argt = fopen("mArg.txt", "w+");
     fint = fopen("inter.txt", "w");
-
+    
     int MDTC=1, MNTC=1, ARGTC=0;
     // fgets(line, sizeof(line), finp);
     fscanf(finp, "%s %s %s", label, opcode, operand);

@@ -41,7 +41,7 @@ void main() {
     linecount = addr;
     fscanf(finp, "%s", line);
     while(line[0]!='E'){
-        printf("hfd");
+        // printf("hfd");
         i=0; j=0;
         level=0;
         while(line[i]!='\0'){

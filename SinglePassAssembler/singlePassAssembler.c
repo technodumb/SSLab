@@ -65,9 +65,8 @@ void main(){
             }
             fscanf(fopt, "%s %s", opmne, opopc);
         }
-            printf("heelo");
         if(!strcmp(opcode, "RESB")){
-                fprintf(flist, "%06X %s %s %s -\n", locctr, label, opcode, operand);
+            fprintf(flist, "%06X %s %s %s -\n", locctr, label, opcode, operand);
             locctr+=atoi(operand);
         }
         else if(!strcmp(opcode, "RESW")){
@@ -85,7 +84,6 @@ void main(){
             if(operand[0]=='X'){
                 for(int i=2; i<strlen(operand)-1; i++){
                         sprintf(curobj, "%s%c", curobj, operand[i]);
-
                 }
             }
             if(operand[0]=='C'){
@@ -111,7 +109,6 @@ void main(){
     fseek(fsnf, 0, SEEK_SET);
     fscanf(fsnf, "%s %s", snflab, snfadd);
     while(!feof(fsnf)){
-    printf("%s %s\n", snflab, snfadd);
         fseek(fsym, 0, SEEK_SET);
         fscanf(fsym, "%s %s", symlab, symadd);
         while(!feof(fsym)){

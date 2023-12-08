@@ -3,10 +3,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-
 void main()
 {
-    FILE *finp, *fout, *farg, *fmdt, *fmnt;
+    FILE *finp, *fout, *fmdt, *fmnt;
     char label[20], opcode[20], operand[20];
     char dlabel[20], dopcode[20], doperand[20];
     char mname[20], mdtline[20], arg[20];
@@ -16,7 +15,6 @@ void main()
     int i, j, di, dj;
     finp = fopen("input.txt", "r");
     fout = fopen("output.txt", "w+");
-    farg = fopen("arg.txt", "w+");
     fmdt = fopen("mdt.txt", "w+");
     fmnt = fopen("mnt.txt", "w+");
     
@@ -36,6 +34,7 @@ void main()
                     argument[j+1]='\0';
                     j++; i++;
                 }
+                
                 strcpy(arguments[narg], argument);
                 fprintf(fmdt, "?%d", narg);
                 if(operand[i]==','){ 
@@ -116,7 +115,6 @@ void main()
     fprintf(fout, "%s %s %s\n", label, opcode, operand);
     fclose(finp);
     fclose(fout);
-    fclose(farg);
     fclose(fmdt);
     fclose(fmnt);
 }
